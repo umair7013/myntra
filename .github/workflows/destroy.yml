@@ -1,0 +1,23 @@
+name: Destroy Project
+
+on:
+  workflow_dispatch:
+
+jobs:
+  destroy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Stop Docker Container
+        run: |
+          docker stop myntra || true
+          docker rm myntra || true
+
+      - name: Configure kubeconfig
+        run: aws eks --region us-east-1 update-kubeconfig --name EKS_CLOUD
+
+      - name: Delete Kubernetes Resources
+        run: kubectl delete -f deployment-service.yml
